@@ -15,7 +15,7 @@ def get_class_names(path="Samples/"):  # class names are subdirectory names in S
 def preprocess_dataset(inpath="Samples/", outpath="Preproc/"):
 
     if not os.path.exists(outpath):
-        os.mkdir( outpath, 0755 );   # make a new directory for preproc'd files
+        os.mkdir( outpath, mode=0o755 );   # make a new directory for preproc'd files
 
     class_names = get_class_names(path=inpath)   # get the names of the subdirectories
     nb_classes = len(class_names)
@@ -23,7 +23,7 @@ def preprocess_dataset(inpath="Samples/", outpath="Preproc/"):
     for idx, classname in enumerate(class_names):   # go through the subdirs
 
         if not os.path.exists(outpath+classname):
-            os.mkdir( outpath+classname, 0755 );   # make a new subdirectory for preproc class
+            os.mkdir( outpath+classname, 0o755 );   # make a new subdirectory for preproc class
 
         class_files = os.listdir(inpath+classname)
         n_files = len(class_files)
