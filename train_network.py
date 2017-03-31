@@ -115,13 +115,23 @@ def build_datasets(train_percentage=0.8, preproc=False):
     train_count = 0
     test_count = 0
     for idx, classname in enumerate(class_names):
+
+
+        #TODO : classename -> dirname , read the classname from annotation subset
+
         this_Y = np.array(encode_class(classname,class_names) )
         this_Y = this_Y[np.newaxis,:]
         class_files = os.listdir(path+classname)
+
+
+
         n_files = len(class_files)
         n_load =  n_files
         n_train = int(train_percentage * n_load)
         printevery = 100
+
+
+
         print("")
         for idx2, infilename in enumerate(class_files[0:n_load]):          
             audio_path = path + classname + '/' + infilename
@@ -177,6 +187,9 @@ def build_model(X,Y,nb_classes):
                         border_mode='valid', input_shape=input_shape))
     model.add(BatchNormalization(axis=1, mode=2))
     model.add(Activation('relu'))
+
+    #TODO : rewrite the CNN model
+    #TODO : rewrite the kernal size
 
     for layer in range(nb_layers-1):
         model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1]))
