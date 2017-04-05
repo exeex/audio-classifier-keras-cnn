@@ -21,6 +21,9 @@ def get_table(filename = "annotations_final.csv"):
 
 
 def get_tags(table):
+    return table[0][1:-2]
+
+def get_fieldnames(table):
     return table[0]
 
 def transpose_table(table):
@@ -36,7 +39,8 @@ def tag_count(table, tags):
 
 def get_hot_tags(top_n = 10):
     t = get_table()
-    tags = get_tags(t)
+    #tags = get_tags(t)
+    tags = get_fieldnames(t)
     counts = tag_count(t,tags)
     tag_rank = sorted(counts, key=lambda x: x[1], reverse=True)
     new_tags =[]
@@ -56,7 +60,7 @@ def get_dict():
 def write_csv_subset(table,filename= "annotations_subset.csv" , tags=[]):
     get_table_subset(table, tags)
     with open(filename, 'w') as csvfile:
-        writer = csv.writer(csvfile, delimiter='\t')
+        writer = csv.writer(csvfile, delimiter='\t',lineterminator='\r')
         for row in table:
             writer.writerow(row)
 
@@ -72,9 +76,28 @@ def get_table_subset(table,tags):
     new_tt.append(tt[-1])
     return transpose_table(new_tt)
 
-table = get_table()
-tags = get_hot_tags()
-write_csv_subset(table,filename= "annotations_subset.csv" ,tags=tags)
+# table = get_table()
+# tags = get_hot_tags()
+# table2 = get_table_subset(table,tags)
+# write_csv_subset(table2,filename= "annotations_subset.csv" ,tags=tags)
 
 #TODO : out put subset of annotation data with tags we picked
 
+#def get_file_path
+#def get_tag_vector
+
+
+class Csv_parser :
+    def __init__(self , filename = "annotations_subset.csv"):
+        self.table = get_table(filename)
+        self.tags = get_tags(self.table)
+    def get_file_path(self,idx):
+        return self.table[idx][-1]
+    def get_tag_vector(self,idx):
+        return self.table[idx][1:-1]
+    def get_clip_number(self,idx):
+        return self.table[idx][0]
+    def get_table(self):
+        return self.table
+    def get_tags(self):
+        return self.tags

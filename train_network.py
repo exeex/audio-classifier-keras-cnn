@@ -26,6 +26,9 @@ from keras import backend
 from keras.utils import np_utils
 import os
 from os.path import isfile
+from read_annotation_csv import Csv_parser as Csv
+
+csv = Csv()
 
 from timeit import default_timer as timer
 
@@ -100,20 +103,27 @@ def build_datasets(train_percentage=0.8, preproc=False):
     else:
         path = "Samples/"
 
-    class_names = get_class_names(path=path)
-    print("class_names = ", class_names)
 
     # TODO : replace by csv.get_tags("annotations_subset.csv")
+    # class_names = get_class_names(path=path)
+    # print("class_names = ", class_names)
+    class_names = csv.get_tags()
+    print("class_names = ", class_names)
 
-
-
+    # TODO : rewrite get_total_files
     total_files, total_train, total_test = get_total_files(path=path, train_percentage=train_percentage)
     print("total files = ", total_files)
 
     nb_classes = len(class_names)
 
+
+
+
     # pre-allocate memory for speed (old method used np.concatenate, slow)
     mel_dims = get_sample_dimensions(path=path)  # Find out the 'shape' of each data file
+
+
+
     X_train = np.zeros((total_train, mel_dims[1], mel_dims[2], mel_dims[3]))
     Y_train = np.zeros((total_train, nb_classes))
     X_test = np.zeros((total_test, mel_dims[1], mel_dims[2], mel_dims[3]))
@@ -123,6 +133,9 @@ def build_datasets(train_percentage=0.8, preproc=False):
 
     train_count = 0
     test_count = 0
+
+    #TODO : for idx , row in filelist
+
     for idx, classname in enumerate(class_names):
 
         # TODO : classename -> dirname , read the classname from annotation subset
