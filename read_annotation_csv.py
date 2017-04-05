@@ -5,11 +5,11 @@ import csv
 #         print(', '.join(row))
 #
 
-filename = "annotations_final.csv"
+
 #DONE : dssign a function to sum up the tag count to find out popular tags
 
 
-def get_table():
+def get_table(filename = "annotations_final.csv"):
     f = open(filename, 'r')
     csv_cursor = csv.reader(f, delimiter='\t')
 
@@ -34,11 +34,15 @@ def tag_count(table, tags):
     return counts
 
 
-def get_hot_tags():
+def get_hot_tags(top_n = 10):
     t = get_table()
     tags = get_tags(t)
     counts = tag_count(t,tags)
-    return sorted(counts,key =lambda x:x[1] , reverse = True)
+    tag_rank = sorted(counts, key=lambda x: x[1], reverse=True)
+    new_tags =[]
+    for element in tag_rank[0:top_n]:
+        new_tags.append(element[0])
+    return new_tags
 
 
 
@@ -49,35 +53,28 @@ def get_dict():
     dict = csv.DictReader(f, delimiter='\t')
     return dict
 
-def write_csv_subset(filename= "annotations_subset.csv" , tags=[]):
-    d = get_dict()
+def write_csv_subset(table,filename= "annotations_subset.csv" , tags=[]):
+    get_table_subset(table, tags)
     with open(filename, 'w') as csvfile:
-        fieldnames = []
-        fieldnames.append("clip_id")
-        for tag in tags:
-            fieldnames.append(tag)
-        fieldnames.append("mp3_path")
+        writer = csv.writer(csvfile, delimiter='\t')
+        for row in table:
+            writer.writerow(row)
 
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-
-
-
-        writer.writeheader()
-        writer.writerow({'clip_id': '0'})
-        writer.writerow({'clip_id': '1'})
-        writer.writerow({'clip_id': '2'})
-
-
+def get_table_subset(table,tags):
+    #table = get_table()
+    #tags = get_hot_tags()
+    tt = transpose_table(table)
+    new_tt = []
+    new_tt.append(tt[0])
+    for row in tt:
+        if row[0] in tags:
+            new_tt.append(row)
+    new_tt.append(tt[-1])
+    return transpose_table(new_tt)
 
 table = get_table()
-tt = transpose_table(table)
-tags = get_tags(table)
-
-for row in tt[0] :
-    if row[0] not in tags:
-
-
-
+tags = get_hot_tags()
+write_csv_subset(table,filename= "annotations_subset.csv" ,tags=tags)
 
 #TODO : out put subset of annotation data with tags we picked
+
