@@ -134,55 +134,52 @@ def build_datasets(train_percentage=0.8, preproc=False):
     train_count = 0
     test_count = 0
 
-    #TODO : for idx , row in filelist
 
-    for idx, classname in enumerate(class_names):
+    filelist = csv.get_total_files()    #TODO : return file list
 
-        # TODO : classename -> dirname , read the classname from annotation subset
 
-        this_Y = np.array(encode_class(classname, class_names))
+    for idx, file in enumerate(filelist):
+
+        this_Y = np.array(csv.get_tag_np_vector(idx))   #TODO: return np.array (dim = tag number)
         this_Y = this_Y[np.newaxis, :]
-        class_files = os.listdir(path + classname)
+        audio_path = os.listdir(path + csv.get_file_path(idx)) #TODO: return np.array (dim = tag number)
 
         n_files = len(class_files)
         n_load = n_files
         n_train = int(train_percentage * n_load)
         printevery = 100
 
-        print("")
-        for idx2, infilename in enumerate(class_files[0:n_load]):
-            audio_path = path + classname + '/' + infilename
-            if (0 == idx2 % printevery):
-                print('\r Loading class: {:14s} ({:2d} of {:2d} classes)'.format(classname, idx + 1, nb_classes),
-                      ", file ", idx2 + 1, " of ", n_load, ": ", audio_path, sep="")
-            # start = timer()
-            if (preproc):
-                melgram = np.load(audio_path)
-                sr = 44100
-            else:
-                aud, sr = librosa.load(audio_path, mono=mono, sr=None)
-                melgram = librosa.logamplitude(librosa.feature.melspectrogram(aud, sr=sr, n_mels=96), ref_power=1.0)[
-                          np.newaxis, np.newaxis, :, :]
+        if (0 == idx % printevery):
+            print('\r Loading class: {:14s} ({:2d} of {:2d} classes)'.format(classname, idx + 1, nb_classes),
+                  ", file ", idx2 + 1, " of ", n_load, ": ", audio_path, sep="")
+        # start = timer()
+        if (preproc):
+            melgram = np.load(audio_path)
+            sr = 44100
+        else:
+            aud, sr = librosa.load(audio_path, mono=mono, sr=None)
+            melgram = librosa.logamplitude(librosa.feature.melspectrogram(aud, sr=sr, n_mels=96), ref_power=1.0)[
+                      np.newaxis, np.newaxis, :, :]
+        melgram = melgram[:, :, :, 0:mel_dims[3]]  # just in case files are differnt sizes: clip to first file size
 
-            melgram = melgram[:, :, :, 0:mel_dims[3]]  # just in case files are differnt sizes: clip to first file size
+        # end = timer()
+        # print("time = ",end - start)
+        if (idx < n_train):
+            # concatenate is SLOW for big datasets; use pre-allocated instead
+            # X_train = np.concatenate((X_train, melgram), axis=0)
+            # Y_train = np.concatenate((Y_train, this_Y), axis=0)
+            X_train[train_count, :, :] = melgram
+            Y_train[train_count, :] = this_Y
+            paths_train.append(audio_path)  # list-appending is still fast. (??)
+            train_count += 1
+        else:
+            X_test[test_count, :, :] = melgram
+            Y_test[test_count, :] = this_Y
+            # X_test = np.concatenate((X_test, melgram), axis=0)
+            # Y_test = np.concatenate((Y_test, this_Y), axis=0)
+            paths_test.append(audio_path)
+            test_count += 1
 
-            # end = timer()
-            # print("time = ",end - start)
-            if (idx2 < n_train):
-                # concatenate is SLOW for big datasets; use pre-allocated instead
-                # X_train = np.concatenate((X_train, melgram), axis=0)
-                # Y_train = np.concatenate((Y_train, this_Y), axis=0)
-                X_train[train_count, :, :] = melgram
-                Y_train[train_count, :] = this_Y
-                paths_train.append(audio_path)  # list-appending is still fast. (??)
-                train_count += 1
-            else:
-                X_test[test_count, :, :] = melgram
-                Y_test[test_count, :] = this_Y
-                # X_test = np.concatenate((X_test, melgram), axis=0)
-                # Y_test = np.concatenate((Y_test, this_Y), axis=0)
-                paths_test.append(audio_path)
-                test_count += 1
         print("")
 
     print("Shuffling order of data...")
@@ -222,6 +219,11 @@ def build_model(X, Y, nb_classes):
     model.add(Dense(nb_classes))
     model.add(Activation("softmax"))
     return model
+
+
+
+
+
 
 
 if __name__ == '__main__':

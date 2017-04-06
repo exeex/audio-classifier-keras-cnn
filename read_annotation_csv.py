@@ -1,4 +1,5 @@
 import csv
+import numpy as np
 # with open('annotations_subset.csv',newline='') as csvfile:
 #     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
 #     for row in spamreader:
@@ -101,3 +102,20 @@ class Csv_parser :
         return self.table
     def get_tags(self):
         return self.tags
+    def get_total_files(self):
+        tt = transpose_table(self.table)
+        return tt[-1]
+    def get_tag_np_vector(self,idx):
+        v = self.get_tag_vector(idx)
+        v2 = np.zeros(len(self.tags))
+        v2
+        try:
+            for idx , value in enumerate(v):
+                if v[idx] == '1':
+                    v2[idx] = 1
+            return v2
+
+        except:
+            return None
+
+gg = Csv_parser()
