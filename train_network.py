@@ -18,7 +18,7 @@ import librosa.display
 
 from keras.models import Sequential, Model
 from keras.layers import Input, Dense, TimeDistributed, LSTM, Dropout, Activation
-from keras.layers import Convolution2D, MaxPooling2D, Flatten
+from keras.layers import Conv2D, MaxPooling2D, Flatten
 from keras.layers.normalization import BatchNormalization
 from keras.layers.advanced_activations import ELU
 from keras.callbacks import ModelCheckpoint
@@ -35,12 +35,12 @@ from timeit import default_timer as timer
 mono = True
 
 
-def get_class_names(path="Preproc/"):  # class names are subdirectory names in Preproc/ directory
+def get_class_names(path="Preproc2/"):  # class names are subdirectory names in Preproc/ directory
     class_names = os.listdir(path)
     return class_names
 
 
-def get_total_files(path="Preproc/", train_percentage=0.8):
+def get_total_files(path="Preproc2/", train_percentage=0.8):
     sum_total = 0
     sum_train = 0
     sum_test = 0
@@ -56,7 +56,7 @@ def get_total_files(path="Preproc/", train_percentage=0.8):
     return sum_total, sum_train, sum_test
 
 
-def get_sample_dimensions(path='Preproc/'):
+def get_sample_dimensions(path='Preproc2/'):
     classname = os.listdir(path)[0]
     files = os.listdir(path + classname)
     infilename = files[0]
@@ -99,9 +99,9 @@ because we want to make sure statistics in training & testing are as similar as 
 
 def build_datasets(train_percentage=0.8, preproc=False):
     if preproc:
-        path = "Preproc/"
+        path = "Preproc2/"
     else:
-        path = "Samples/"
+        path = "../Music/"
 
 
     # TODO : replace by csv.get_tags("annotations_subset.csv")
@@ -111,10 +111,10 @@ def build_datasets(train_percentage=0.8, preproc=False):
     print("class_names = ", class_names)
 
     # TODO : rewrite get_total_files
-    total_files, total_train, total_test = get_total_files(path=path, train_percentage=train_percentage)
-    print("total files = ", total_files)
-
-    nb_classes = len(class_names)
+    # total_files, total_train, total_test = get_total_files(path=path, train_percentage=train_percentage)
+    # print("total files = ", total_files)
+    #
+    # nb_classes = len(class_names)
 
 
 
@@ -122,7 +122,13 @@ def build_datasets(train_percentage=0.8, preproc=False):
     # pre-allocate memory for speed (old method used np.concatenate, slow)
     mel_dims = get_sample_dimensions(path=path)  # Find out the 'shape' of each data file
 
-
+    filelist = csv.get_total_files()    #TODO : return file list
+    filelist_train = filelist[0:1000]
+    filelist_test = filelist[1000:1100]
+    filelist_train_test = filelist[0:1100]
+    total_train = len(filelist_train)
+    total_test = len(filelist_train_test)
+    nb_classes = len(csv.get_tags())
 
     X_train = np.zeros((total_train, mel_dims[1], mel_dims[2], mel_dims[3]))
     Y_train = np.zeros((total_train, nb_classes))
@@ -135,26 +141,25 @@ def build_datasets(train_percentage=0.8, preproc=False):
     test_count = 0
 
 
-    filelist = csv.get_total_files()    #TODO : return file list
 
 
-    for idx, file in enumerate(filelist):
+
+    for idx, file in enumerate(filelist_train_test):
 
         this_Y = np.array(csv.get_tag_np_vector(idx))   #TODO: return np.array (dim = tag number)
-        this_Y = this_Y[np.newaxis, :]
-        audio_path = os.listdir(path + csv.get_file_path(idx)) #TODO: return np.array (dim = tag number)
+        audio_path = path + csv.get_file_path(idx) #TODO: return np.array (dim = tag number)
 
-        n_files = len(class_files)
+        n_files = len(filelist_train_test)
         n_load = n_files
         n_train = int(train_percentage * n_load)
         printevery = 100
 
         if (0 == idx % printevery):
-            print('\r Loading class: {:14s} ({:2d} of {:2d} classes)'.format(classname, idx + 1, nb_classes),
-                  ", file ", idx2 + 1, " of ", n_load, ": ", audio_path, sep="")
+            print('\r Loading file: {:14s} ({:2d} of {:2d} classes)'.format(file, idx + 1, nb_classes),
+                  ", file ", idx + 1, " of ", n_load, ": ", audio_path, sep="")
         # start = timer()
         if (preproc):
-            melgram = np.load(audio_path)
+            melgram = np.load(audio_path+".npy")
             sr = 44100
         else:
             aud, sr = librosa.load(audio_path, mono=mono, sr=None)
@@ -180,7 +185,7 @@ def build_datasets(train_percentage=0.8, preproc=False):
             paths_test.append(audio_path)
             test_count += 1
 
-        print("")
+
 
     print("Shuffling order of data...")
     X_train, Y_train, paths_train = shuffle_XY_paths(X_train, Y_train, paths_train)
@@ -193,24 +198,29 @@ def build_model(X, Y, nb_classes):
     nb_filters = 32  # number of convolutional filters to use
     pool_size = (2, 2)  # size of pooling area for max pooling
     kernel_size = (3, 12)  # convolution kernel size
-    nb_layers = 4
     input_shape = (1, X.shape[2], X.shape[3])
 
     model = Sequential()
-    model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1],
-                            border_mode='valid', input_shape=input_shape))
-    model.add(BatchNormalization(axis=1, mode=2))
+
+    #layer 1
+    model.add(Conv2D(nb_filters, (128,4) ,border_mode='valid', input_shape=input_shape))
+    model.add(BatchNormalization(axis=1))
+    model.add(MaxPooling2D(pool_size=(1,3)))
     model.add(Activation('relu'))
 
-    # TODO : rewrite the CNN model
-    # TODO : rewrite the kernal size
+    #layer 2
+    model.add(Conv2D(nb_filters, (1,4)))
+    model.add(BatchNormalization(axis=1))
+    model.add(MaxPooling2D(pool_size=(1,2)))
+    model.add(ELU(alpha=1.0))
+    model.add(Dropout(0.25))
 
-    for layer in range(nb_layers - 1):
-        model.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1]))
-        model.add(BatchNormalization(axis=1, mode=2))
-        model.add(ELU(alpha=1.0))
-        model.add(MaxPooling2D(pool_size=pool_size))
-        model.add(Dropout(0.25))
+    #layer 3
+    model.add(Conv2D(nb_filters, (1,4)))
+    model.add(BatchNormalization(axis=1))
+    model.add(ELU(alpha=1.0))
+    model.add(MaxPooling2D(pool_size=(1,2)))
+    model.add(Dropout(0.25))
 
     model.add(Flatten())
     model.add(Dense(128))

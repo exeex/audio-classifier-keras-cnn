@@ -1,16 +1,15 @@
 import csv
-import numpy as np
 # with open('annotations_subset.csv',newline='') as csvfile:
 #     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
 #     for row in spamreader:
 #         print(', '.join(row))
 #
 
-
+filename = "annotations_final.csv"
 #DONE : dssign a function to sum up the tag count to find out popular tags
 
 
-def get_table(filename = "annotations_final.csv"):
+def get_table():
     f = open(filename, 'r')
     csv_cursor = csv.reader(f, delimiter='\t')
 
@@ -22,9 +21,6 @@ def get_table(filename = "annotations_final.csv"):
 
 
 def get_tags(table):
-    return table[0][1:-2]
-
-def get_fieldnames(table):
     return table[0]
 
 def transpose_table(table):
@@ -38,16 +34,11 @@ def tag_count(table, tags):
     return counts
 
 
-def get_hot_tags(top_n = 10):
+def get_hot_tags():
     t = get_table()
-    #tags = get_tags(t)
-    tags = get_fieldnames(t)
+    tags = get_tags(t)
     counts = tag_count(t,tags)
-    tag_rank = sorted(counts, key=lambda x: x[1], reverse=True)
-    new_tags =[]
-    for element in tag_rank[0:top_n]:
-        new_tags.append(element[0])
-    return new_tags
+    return sorted(counts,key =lambda x:x[1] , reverse = True)
 
 
 
@@ -58,64 +49,35 @@ def get_dict():
     dict = csv.DictReader(f, delimiter='\t')
     return dict
 
-def write_csv_subset(table,filename= "annotations_subset.csv" , tags=[]):
-    get_table_subset(table, tags)
+def write_csv_subset(filename= "annotations_subset.csv" , tags=[]):
+    d = get_dict()
     with open(filename, 'w') as csvfile:
-        writer = csv.writer(csvfile, delimiter='\t',lineterminator='\r')
-        for row in table:
-            writer.writerow(row)
+        fieldnames = []
+        fieldnames.append("clip_id")
+        for tag in tags:
+            fieldnames.append(tag)
+        fieldnames.append("mp3_path")
 
-def get_table_subset(table,tags):
-    #table = get_table()
-    #tags = get_hot_tags()
-    tt = transpose_table(table)
-    new_tt = []
-    new_tt.append(tt[0])
-    for row in tt:
-        if row[0] in tags:
-            new_tt.append(row)
-    new_tt.append(tt[-1])
-    return transpose_table(new_tt)
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-# table = get_table()
-# tags = get_hot_tags()
-# table2 = get_table_subset(table,tags)
-# write_csv_subset(table2,filename= "annotations_subset.csv" ,tags=tags)
+
+
+
+        writer.writeheader()
+        writer.writerow({'clip_id': '0'})
+        writer.writerow({'clip_id': '1'})
+        writer.writerow({'clip_id': '2'})
+
+
+
+table = get_table()
+tt = transpose_table(table)
+tags = get_tags(table)
+
+for row in tt[0] :
+    if row[0] not in tags:
+
+
+
 
 #TODO : out put subset of annotation data with tags we picked
-
-#def get_file_path
-#def get_tag_vector
-
-
-class Csv_parser :
-    def __init__(self , filename = "annotations_subset.csv"):
-        self.table = get_table(filename)
-        self.tags = get_tags(self.table)
-    def get_file_path(self,idx):
-        return self.table[idx][-1]
-    def get_tag_vector(self,idx):
-        return self.table[idx][1:-1]
-    def get_clip_number(self,idx):
-        return self.table[idx][0]
-    def get_table(self):
-        return self.table
-    def get_tags(self):
-        return self.tags
-    def get_total_files(self):
-        tt = transpose_table(self.table)
-        return tt[-1]
-    def get_tag_np_vector(self,idx):
-        v = self.get_tag_vector(idx)
-        v2 = np.zeros(len(self.tags))
-        v2
-        try:
-            for idx , value in enumerate(v):
-                if v[idx] == '1':
-                    v2[idx] = 1
-            return v2
-
-        except:
-            return None
-
-gg = Csv_parser()
