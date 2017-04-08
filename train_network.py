@@ -127,7 +127,7 @@ def build_datasets(train_percentage=0.8, preproc=False):
     filelist_test = filelist[1000:1100]
     filelist_train_test = filelist[1:1100]
     total_train = len(filelist_train)
-    total_test = len(filelist_train_test)
+    total_test = len(filelist_test)
     nb_classes = len(csv.get_tags())
 
     X_train = np.zeros((total_train, mel_dims[1], mel_dims[2], mel_dims[3]))
@@ -169,7 +169,7 @@ def build_datasets(train_percentage=0.8, preproc=False):
 
         # end = timer()
         # print("time = ",end - start)
-        if (idx < n_train):
+        if (idx < total_train):
             # concatenate is SLOW for big datasets; use pre-allocated instead
             # X_train = np.concatenate((X_train, melgram), axis=0)
             # Y_train = np.concatenate((Y_train, this_Y), axis=0)
@@ -187,9 +187,9 @@ def build_datasets(train_percentage=0.8, preproc=False):
 
 
 
-    # print("Shuffling order of data...")
-    # X_train, Y_train, paths_train = shuffle_XY_paths(X_train, Y_train, paths_train)
-    # X_test, Y_test, paths_test = shuffle_XY_paths(X_test, Y_test, paths_test)
+    print("Shuffling order of data...")
+    X_train, Y_train, paths_train = shuffle_XY_paths(X_train, Y_train, paths_train)
+    X_test, Y_test, paths_test = shuffle_XY_paths(X_test, Y_test, paths_test)
 
     return X_train, Y_train, paths_train, X_test, Y_test, paths_test, class_names, sr
 
