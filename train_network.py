@@ -271,3 +271,4 @@ if __name__ == '__main__':
     score = model.evaluate(X_test, Y_test, verbose=0)
     print('Test score:', score[0])
     print('Test accuracy:', score[1])
+ cd
