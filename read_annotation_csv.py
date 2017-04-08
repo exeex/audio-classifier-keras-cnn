@@ -76,7 +76,7 @@ def get_table_subset(table,tags):
             new_tt.append(row)
     new_tt.append(tt[-1])
     return transpose_table(new_tt)
-
+#
 # table = get_table()
 # tags = get_hot_tags()
 # table2 = get_table_subset(table,tags)
@@ -91,11 +91,12 @@ def get_table_subset(table,tags):
 class Csv_parser :
     def __init__(self , filename = "annotations_subset.csv"):
         self.table = get_table(filename)
+        self.table_content = self.table[1:]
         self.tags = get_tags(self.table)
     def get_file_path(self,idx):
-        return self.table[idx][-1]
+        return self.table_content[idx][-1]
     def get_tag_vector(self,idx):
-        return self.table[idx][1:-1]
+        return self.table_content[idx][1:-1]
     def get_clip_number(self,idx):
         return self.table[idx][0]
     def get_table(self):
@@ -103,7 +104,7 @@ class Csv_parser :
     def get_tags(self):
         return self.tags
     def get_total_files(self):
-        tt = transpose_table(self.table)
+        tt = transpose_table(self.table_content)
         return tt[-1]
     def get_tag_np_vector(self,idx):
         v = self.get_tag_vector(idx)
