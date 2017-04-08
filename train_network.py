@@ -10,7 +10,7 @@ This is kind of a mixture of Keun Woo Choi's code https://github.com/keunwoochoi
 Trained using Fraunhofer IDMT's database of monophonic guitar effects, 
    clips were 2 seconds long, sampled at 44100 Hz
 '''
-from random import shuffle
+
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa
@@ -123,15 +123,9 @@ def build_datasets(train_percentage=0.8, preproc=False):
     mel_dims = get_sample_dimensions(path=path)  # Find out the 'shape' of each data file
 
     filelist = csv.get_total_files()    #TODO : return file list
-    filelist_n = filelist[1:6000]
-    filelist_train = filelist_n[1:5000]
-    filelist_test = filelist_n[5000:6000]
-    filelist_train_test = filelist_n[1:6000]
-
-    sum_total = 6000
-    sum_train = 5000
-    sum_test = sum_total - sum_train
-
+    filelist_train = filelist[1:1000]
+    filelist_test = filelist[1000:1100]
+    filelist_train_test = filelist[1:1100]
     total_train = len(filelist_train)
     total_test = len(filelist_train_test)
     nb_classes = len(csv.get_tags())
@@ -193,15 +187,15 @@ def build_datasets(train_percentage=0.8, preproc=False):
 
 
 
-    print("Shuffling order of data...")
-    X_train, Y_train, paths_train = shuffle_XY_paths(X_train, Y_train, paths_train)
-    X_test, Y_test, paths_test = shuffle_XY_paths(X_test, Y_test, paths_test)
+    # print("Shuffling order of data...")
+    # X_train, Y_train, paths_train = shuffle_XY_paths(X_train, Y_train, paths_train)
+    # X_test, Y_test, paths_test = shuffle_XY_paths(X_test, Y_test, paths_test)
 
     return X_train, Y_train, paths_train, X_test, Y_test, paths_test, class_names, sr
 
 
 def build_model(X, Y, nb_classes):
-    nb_filters = 64  # number of convolutional filters to use
+    nb_filters = 32  # number of convolutional filters to use
     pool_size = (2, 2)  # size of pooling area for max pooling
     kernel_size = (3, 12)  # convolution kernel size
     input_shape = (1, X.shape[2], X.shape[3])
