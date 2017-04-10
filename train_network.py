@@ -123,9 +123,9 @@ def build_datasets(train_percentage=0.8, preproc=False):
     mel_dims = get_sample_dimensions(path=path)  # Find out the 'shape' of each data file
 
     filelist = csv.get_total_files()    #TODO : return file list
-    filelist_train = filelist[1:1000]
-    filelist_test = filelist[1000:1100]
-    filelist_train_test = filelist[1:1100]
+    filelist_train = filelist[1:3000]
+    filelist_test = filelist[3000:4000]
+    filelist_train_test = filelist[1:4000]
     total_train = len(filelist_train)
     total_test = len(filelist_test)
     nb_classes = len(csv.get_tags())
@@ -202,32 +202,38 @@ def build_model(X, Y, nb_classes):
 
     model = Sequential()
 
+    model.add(BatchNormalization(axis=1, input_shape=input_shape))
     #layer 1
-    model.add(Conv2D(nb_filters, (128,4) ,border_mode='valid', input_shape=input_shape))
+    model.add(Conv2D(32, (3,3) ,padding='same'))
     model.add(BatchNormalization(axis=1))
-    model.add(MaxPooling2D(pool_size=(1,3)))
-    model.add(Activation('relu'))
+    model.add(ELU())
+    model.add(MaxPooling2D(pool_size=(3,3)))
 
     #layer 2
     model.add(Conv2D(nb_filters, (1,4)))
     model.add(BatchNormalization(axis=1))
-    model.add(MaxPooling2D(pool_size=(1,2)))
     model.add(ELU(alpha=1.0))
-    model.add(Dropout(0.25))
+    model.add(MaxPooling2D(pool_size=(2,2)))
 
     #layer 3
     model.add(Conv2D(nb_filters, (1,4)))
     model.add(BatchNormalization(axis=1))
-    model.add(ELU(alpha=1.0))
-    model.add(MaxPooling2D(pool_size=(1,2)))
-    model.add(Dropout(0.25))
+    model.add(MaxPooling2D(pool_size=(2,2)))
+    #layer 4
+    model.add(Conv2D(nb_filters, (1,4)))
+    model.add(BatchNormalization(axis=1))
+    model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Flatten())
     model.add(Dense(128))
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.4))
     model.add(Dense(nb_classes))
     model.add(Activation("softmax"))
+
+
+
+
     return model
 
 
