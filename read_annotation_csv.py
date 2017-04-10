@@ -45,7 +45,7 @@ def get_hot_tags(top_n = 10):
     counts = tag_count(t,tags)
     tag_rank = sorted(counts, key=lambda x: x[1], reverse=True)
     new_tags =[]
-    for element in tag_rank[0:top_n]:
+    for element in tag_rank[0:top_n+1]:
         new_tags.append(element[0])
     return new_tags
 
@@ -76,11 +76,12 @@ def get_table_subset(table,tags):
             new_tt.append(row)
     new_tt.append(tt[-1])
     return transpose_table(new_tt)
-#
-# table = get_table()
-# tags = get_hot_tags()
-# table2 = get_table_subset(table,tags)
-# write_csv_subset(table2,filename= "annotations_subset.csv" ,tags=tags)
+
+def build_subset_csv():
+    table = get_table()
+    tags = get_hot_tags(20)
+    table2 = get_table_subset(table,tags)
+    write_csv_subset(table2,filename= "annotations_subset.csv" ,tags=tags)
 
 #TODO : out put subset of annotation data with tags we picked
 
