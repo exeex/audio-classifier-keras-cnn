@@ -21,7 +21,7 @@ def get_class_names(path="Samples/"):  # class names are subdirectory names in S
     return class_names
 
 
-def preprocess_dataset(inpath="../Music/", outpath="Preproc2/"):
+def preprocess_dataset(inpath="../Music/", outpath="Preproc3/"):
     if not os.path.exists(outpath):
         os.mkdir(outpath, mode=0o755);  # make a new directory for preproc'd files
 
@@ -54,7 +54,7 @@ def preprocess_dataset(inpath="../Music/", outpath="Preproc2/"):
             except:
                 eprint("load file {} failed".format(audio_path))
                 pass
-            melgram = librosa.logamplitude(librosa.feature.melspectrogram(aud, sr=sr, n_mels=128, hop_length=1445 ), ref_power=1.0)[
+            melgram = librosa.logamplitude(librosa.feature.melspectrogram(aud, sr=sr, n_mels=200, n_fft=1024, hop_length=512), ref_power=1.0)[
                       np.newaxis, np.newaxis, :, :]
             outfile = outpath + classname + '/' + infilename + '.npy'
             np.save(outfile, melgram)
