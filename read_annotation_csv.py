@@ -33,7 +33,7 @@ def transpose_table(table):
 def tag_count(table, tags):
     tt = transpose_table(table)
     counts=[]
-    for x in range(1,len(tt)):
+    for x in range(1,len(tt)-1):
         counts.append([tags[x],tt[x].count('1')])
     return counts
 
@@ -110,7 +110,6 @@ class Csv_parser :
     def get_tag_np_vector(self,idx):
         v = self.get_tag_vector(idx)
         v2 = np.zeros(len(self.tags))
-        v2
         try:
             for idx , value in enumerate(v):
                 if v[idx] == '1':
@@ -120,4 +119,4 @@ class Csv_parser :
         except:
             return None
 
-gg = Csv_parser()
+csv_content = Csv_parser()
