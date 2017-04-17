@@ -9,16 +9,10 @@ from keras.callbacks import ModelCheckpoint
 from keras import backend
 from keras.utils import np_utils
 from keras.utils import plot_model
+from keras import losses
 
 from IPython.display import SVG
 from keras.utils.vis_utils import model_to_dot
-
-
-
-
-
-
-
 
 
 
@@ -54,16 +48,26 @@ def plot_filter(filter):
     return
 
 def plot_filters(layer_weights):
-    for x in range(conv2d_1.shape[3]):
+    for x in range(layer_weights.shape[3]):
         print(x)
-        plot_filter(conv2d_1[:,:,0,0])
+        plot_filter(layer_weights[:,:,0,0])
 
 filepath = 'weightsss'
 model = get_model()
-model.load_weights(filepath)
-conv2d_1 = get_layer_weight(model,'conv2d_1')[0]
+
+# model.load_weights(filepath,by_name=False)
+# conv2d_1 = get_layer_weight(model,'conv2d_1')[0]
 
 
 
 
-
+# from keras import backend as K
+#
+# inp = model.input                                           # input placeholder
+# outputs = [layer.output for layer in model.layers]          # all layer outputs
+# functors = [K.function([inp]+ [K.learning_phase()], [out]) for out in outputs]  # evaluation functions
+#
+# # Testing
+# test = np.random.random(input_shape)[np.newaxis,...]
+# layer_outs = [func([test, 1.]) for func in functors]
+# print(layer_outs)
