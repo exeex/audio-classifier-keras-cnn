@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import random
 # with open('annotations_subset.csv',newline='') as csvfile:
 #     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
 #     for row in spamreader:
@@ -79,7 +80,7 @@ def get_table_subset(table,tags):
 
 def build_subset_csv():
     table = get_table()
-    tags = get_hot_tags(20)
+    tags = get_hot_tags(50)
     table2 = get_table_subset(table,tags)
     write_csv_subset(table2,filename= "annotations_subset.csv" ,tags=tags)
 
@@ -91,17 +92,17 @@ def build_subset_csv():
 
 class Csv_parser :
     def __init__(self , filename = "annotations_subset.csv"):
-        self.table = get_table(filename)
-        self.table_content = self.table[1:]
-        self.tags = get_tags(self.table)
+        table = get_table(filename)
+        self.table_content = table[1:]
+        self.tags = get_tags(table)
     def get_file_path(self,idx):
         return self.table_content[idx][-1]
     def get_tag_vector(self,idx):
         return self.table_content[idx][1:-1]
     def get_clip_number(self,idx):
-        return self.table[idx][0]
+        return self.table_content[idx][0]
     def get_table(self):
-        return self.table
+        return self.table_content
     def get_tags(self):
         return self.tags
     def get_total_files(self):
@@ -118,5 +119,16 @@ class Csv_parser :
 
         except:
             return None
+    def get_file_numbers(self):
+        return len(self.table_content)
+
+    def subset(self, percentage):
+        total = self.get_file_numbers()
+        partial = int(round(total*percentage,0))
+        self.table_content = self.table_content[0:partial]
+
+    def shuffle(self):
+        random.shuffle(self.table_content)
+
 
 csv_content = Csv_parser()
