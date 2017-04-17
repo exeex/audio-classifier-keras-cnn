@@ -5,3 +5,5 @@ Preproc*
 
 *.mp3
 .idea/
+
+audio-classifier-keras-cnn

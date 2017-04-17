@@ -42,9 +42,9 @@ class visualizer:
         plt.tight_layout()
 
 
-path = "/home/cswu/audio-classifier-keras-cnn/Preproc3/0/american_bach_soloists-j_s__bach__cantatas_volume_v-01-gleichwie_der_regen_und_schnee_vom_himmel_fallt_bwv_18_i_sinfonia-0-29.mp3.npy"
+path = "/home/cswu/audio-classifier-keras-cnn/Samples/class1/american_bach_soloists-joseph_haydn__masses-01-kyrie__allegro_moderato-88-117.mp3"
 path2 = "/home/cswu/audio-classifier-keras-cnn/Preproc/0/american_bach_soloists-j_s__bach__cantatas_volume_v-01-gleichwie_der_regen_und_schnee_vom_himmel_fallt_bwv_18_i_sinfonia-0-29.mp3.npy"
 v = visualizer()
-
+v.draw_mel_mp3(path)
 
 
