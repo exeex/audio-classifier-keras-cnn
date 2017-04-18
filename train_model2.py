@@ -14,6 +14,8 @@ from os.path import isfile
 from read_annotation_csv import Csv_parser as Csv
 
 csv = Csv()
+csv.shuffle()
+csv.subset(0.1)
 path = "Preproc/"
 sr = 16000
 
@@ -48,14 +50,17 @@ def get_total_x():
     filelist = get_total_filelist()
     total = csv.get_file_numbers()
     x = np.zeros((total,1,mel_dims[2],mel_dims[3]),'float32')
-    printevery = 100
+    printevery = 10
     for idx,filepath in enumerate(filelist):
         audio_path = path + filepath
         if 0 == idx % printevery:
             print("load {0} / {1} file".format(idx,total))
-        melgram = np.load(audio_path + ".npy")
-        x[idx,:,:] = melgram
-
+        melgram = np.load(audio_path)
+        try:
+            x[idx,:,:] = melgram
+        except ValueError:   #pad zero
+            np.lib.pad(melgram, (0, mel_dims[3]-melgram.shape[3]), 'constant', constant_values=(0, 0))
+            x[idx,:,:] = melgram
     return x
 
 def get_train_x(total_x):
@@ -68,6 +73,8 @@ def get_test_y(y):
     return
 
 def build_datasets(train_percentage=0.8, preproc=False):
+    x = get_total_x()
+    y = get_total_y()
     return
 
 
