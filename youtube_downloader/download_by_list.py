@@ -3,6 +3,7 @@ import csv
 
 
 import csv
+import os
 filename = "fileurls.csv"
 
 def get_table():
@@ -32,9 +33,6 @@ def tag_count(table, tags):
 table = get_table()
 tt = transpose_table(table)
 tags = get_tags(table)
-
-
-
 
 tt
 

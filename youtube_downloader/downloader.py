@@ -1,9 +1,13 @@
 from __future__ import unicode_literals
 import youtube_dl
 import os
-
+import os
 
 filenames = []
+
+os.environ["PATH"] += os.pathsep + "/usr/local/bin"
+
+
 
 class MyLogger(object):
     def debug(self, msg):
@@ -37,6 +41,7 @@ def my_hook(d):
 ydl_opts = {
     'format': 'bestaudio/best',
     'noplaylist': 'True',
+    'verbose': 'True',
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
@@ -46,7 +51,6 @@ ydl_opts = {
     'logger': MyLogger(),
     'progress_hooks': [my_hook],
 }
-
 
 
 
