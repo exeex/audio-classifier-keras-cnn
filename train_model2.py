@@ -14,15 +14,15 @@ from os.path import isfile
 from read_annotation_csv import Csv_parser as Csv
 
 csv = Csv()
-path = "Preproc2/"
+path = "Preproc/"
 sr = 16000
 
-def get_sample_dimensions(path='Preproc2/'):
+def get_sample_dimensions(path='Preproc/'):
     try:
         classname = os.listdir(path)[0]
-        files = os.listdir(path + classname)
+        files = os.listdir(path)
         infilename = files[0]
-        audio_path = path + classname + '/' + infilename
+        audio_path = path + infilename
         melgram = np.load(audio_path)
         print("   get_sample_dimensions: melgram.shape = ", melgram.shape)
     except FileNotFoundError:
@@ -36,9 +36,12 @@ def get_total_filelist():
     return csv.get_total_files()
 
 def get_total_y():
-    y = []
-    for idx in range(csv.get_file_numbers()):
-        y.append(csv.get_tag_np_vector(0))
+    total_file_number = csv.get_file_numbers()
+    tag_number = len(csv.get_tags())
+
+    y = np.zeros((total_file_number,tag_number),dtype='float32')
+    for idx in range(total_file_number):
+        y[idx] = csv.get_tag_np_vector(0)
     return y
 
 def get_total_x():
@@ -65,13 +68,7 @@ def get_test_y(y):
     return
 
 def build_datasets(train_percentage=0.8, preproc=False):
+    return
 
-
-
-    X_train = np.zeros((total_train, mel_dims[1], mel_dims[2], mel_dims[3]))
-    Y_train = np.zeros((total_train, nb_classes))
-    X_test = np.zeros((total_test, mel_dims[1], mel_dims[2], mel_dims[3]))
-    Y_test = np.zeros((total_test, nb_classes))
-    return train_x ,train_y ,test_x , test_y
 
 

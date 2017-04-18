@@ -23,7 +23,7 @@ def get_table(filename = "annotations_final.csv"):
 
 
 def get_tags(table):
-    return table[0][1:-2]
+    return table[0][1:-1]
 
 def get_fieldnames(table):
     return table[0]
